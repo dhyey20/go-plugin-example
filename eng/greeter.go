@@ -2,11 +2,19 @@ package main
 
 import "fmt"
 
-type greeting string
-
-func (g greeting) Greet() {
-	fmt.Println("Hello Universe")
+type greeting struct {
+	config string
 }
 
-// exported
 var Greeter greeting
+
+func (g greeting) GreetFunction() string {
+	fmt.Println("Hello Universe")
+	return "Hello Universe"
+}
+
+func New() {
+	Greeter = greeting{
+		config: "test",
+	}
+}

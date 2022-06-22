@@ -6,8 +6,9 @@ import (
 	"plugin"
 )
 
-type Greeter interface {
-	Greet()
+type GreeterInterface interface {
+	GreetFunction() string
+	// SecondGreetFunction() string
 }
 
 func main() {
@@ -22,8 +23,8 @@ func main() {
 		mod = "./eng/eng.so"
 	case "chinese":
 		mod = "./chi/chi.so"
- 	case "swedish":
-	        mod = "./swe/swe.so"
+	case "swedish":
+		mod = "./swe/swe.so"
 	default:
 		fmt.Println("don't speak that language")
 		os.Exit(1)
@@ -36,25 +37,35 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
+	fmt.Println("after open")
 	// 2. look up a symbol (an exported function or variable)
 	// in this case, variable Greeter
+	symNew, err := plug.Lookup("New")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	newFunction := symNew.(func())
+	newFunction()
+	fmt.Println("after new")
+
 	symGreeter, err := plug.Lookup("Greeter")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	fmt.Println("after symgreeter")
 
 	// 3. Assert that loaded symbol is of a desired type
 	// in this case interface type Greeter (defined above)
-	var greeter Greeter
-	greeter, ok := symGreeter.(Greeter)
+	var greeter GreeterInterface
+	greeter, ok := symGreeter.(GreeterInterface)
 	if !ok {
 		fmt.Println("unexpected type from module symbol")
 		os.Exit(1)
 	}
 
 	// 4. use the module
-	greeter.Greet()
-
+	returnString := (greeter).GreetFunction()
+	fmt.Println("return string is ", returnString)
 }
