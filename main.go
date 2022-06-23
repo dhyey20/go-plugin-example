@@ -2,14 +2,10 @@ package main
 
 import (
 	"fmt"
+	g "greeter/pkg/greeter"
 	"os"
 	"plugin"
 )
-
-type GreeterInterface interface {
-	GreetFunction() string
-	// SecondGreetFunction() string
-}
 
 func main() {
 	// determine module to load
@@ -45,21 +41,21 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	newFunction := symNew.(func())
-	newFunction()
+	newFunction := symNew.(func() g.GreeterInterface)
+	symGreeter := newFunction()
 	fmt.Println("after new")
 
-	symGreeter, err := plug.Lookup("Greeter")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println("after symgreeter")
+	// symGreeter, err := plug.Lookup("Greeter")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
+	// }
+	// fmt.Println("after symgreeter")
 
-	// 3. Assert that loaded symbol is of a desired type
-	// in this case interface type Greeter (defined above)
-	var greeter GreeterInterface
-	greeter, ok := symGreeter.(GreeterInterface)
+	// // 3. Assert that loaded symbol is of a desired type
+	// // in this case interface type Greeter (defined above)
+	// var greeter g.GreeterInterface
+	greeter, ok := symGreeter.(g.GreeterInterface)
 	if !ok {
 		fmt.Println("unexpected type from module symbol")
 		os.Exit(1)
